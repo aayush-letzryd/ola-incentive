@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS public.sheet_ola_incentive_summary (
     actual_ondemand NUMERIC(14,2) DEFAULT 0,
     instapay_transfer NUMERIC(14,2) DEFAULT 0,
     total_online_payment NUMERIC(14,2) DEFAULT 0,
+    is_total BOOLEAN DEFAULT FALSE,
     source_file_name VARCHAR(255) NOT NULL,
     source_file_id VARCHAR(255) NOT NULL,
     week_start_date DATE,
@@ -78,6 +79,7 @@ CREATE TABLE IF NOT EXISTS public.sheet_ola_incentive_summary (
 CREATE INDEX IF NOT EXISTS idx_ola_summary_source_file ON public.sheet_ola_incentive_summary(source_file_id);
 CREATE INDEX IF NOT EXISTS idx_ola_summary_date ON public.sheet_ola_incentive_summary(date);
 CREATE INDEX IF NOT EXISTS idx_ola_summary_report_type ON public.sheet_ola_incentive_summary(report_type);
+CREATE INDEX IF NOT EXISTS idx_ola_summary_is_total ON public.sheet_ola_incentive_summary(is_total);
 CREATE INDEX IF NOT EXISTS idx_ola_summary_week_start ON public.sheet_ola_incentive_summary(week_start_date);
 
 -- 4. Ola Report Tab Table

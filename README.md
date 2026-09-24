@@ -81,7 +81,7 @@ All tables reside in the `public` schema in PostgreSQL:
 | :--- | :--- | :--- |
 | `sheet_ola_incentive_status` | Status tab containing vehicle matching and payouts | `date`, `car_number`, `date_for`, `amount_raw`, `status`, `actual_incentive`, `actual_ondemand`, `instapay_transfer`, `total_online_payment`, `week_start_date` |
 | `sheet_ola_incentive_bank_statement` | Bank statement credits and IMPS UTR transfers | `date`, `utr`, `amount`, `vehicles`, `city`, `status`, `reason`, `actual_incentive`, `actual_ondemand`, `instapay_transfer`, `week_start_date` |
-| `sheet_ola_incentive_summary` | Normalized daily summary categorized by report type | `date`, `report_type` (`Ola report` / `Bank statement`), `actual_incentive`, `actual_ondemand`, `instapay_transfer`, `total_online_payment`, `week_start_date` |
+| `sheet_ola_incentive_summary` | Normalized daily summary categorized by report type | `date`, `report_type` (`Ola report` / `Bank statement`), `actual_incentive`, `actual_ondemand`, `instapay_transfer`, `total_online_payment`, `is_total`, `week_start_date` |
 | `sheet_ola_incentive_ola_report` | Raw Ola platform transaction report | `date`, `type`, `car_number`, `car_model`, `date_for`, `amount_raw`, `status`, `sub_category`, `payment_type`, `week_start_date` |
 | `sheet_ola_incentive_pipeline_logs` | Audit log of every pipeline execution cycle | `file_id`, `file_name`, `status_rows_count`, `bank_statement_rows_count`, `summary_rows_count`, `ola_report_rows_count`, `total_rows_count`, `execution_status`, `started_at`, `completed_at` |
 
@@ -94,15 +94,21 @@ The raw `Summary` tab in the Excel workbook is formatted as:
 Row 1: [ Date ] [ ---------- Ola report ---------- ] [ -------- Bank statement -------- ]
 Row 2: [      ] [ Incentive | Ondemand | InstaPay | Total ] [ Incentive | Ondemand | InstaPay | Total ]
 Row 3: [2026-09-07] [  96616   |    0     |    0     |   0   ] [  97351.2 |    0     |    0     |   0   ]
+...
+Row 10: [ Total ] [ 142778    |  1516    |  13707   | 15223 ] [ 142775.8|  1516.0  |  13706.2 | 15222 ]
 ```
 
-The pipeline unpivots each day into **two normalized rows**:
+The pipeline unpivots each day plus the Total row into **normalized rows with an `is_total` flag**:
 ```text
-Date        | report_type     | actual_incentive | actual_ondemand | instapay_transfer | total_online_payment
-2026-09-07  | Ola report      | 96616.00         | 0.00            | 0.00              | 0.00
-2026-09-07  | Bank statement  | 97351.24         | 0.00            | 0.00              | 0.00
+Date        | report_type     | actual_incentive | actual_ondemand | instapay_transfer | total_online_payment | is_total
+2026-09-07  | Ola report      | 96616.00         | 0.00            | 0.00              | 0.00                 | false
+2026-09-07  | Bank statement  | 97351.24         | 0.00            | 0.00              | 0.00                 | false
+...
+2026-09-13  | Ola report      | 142778.00        | 1516.00         | 13707.00          | 15223.00             | true
+2026-09-13  | Bank statement  | 142775.82        | 1516.02         | 13706.22          | 15222.24             | true
 ```
-This enables clean SQL aggregations, time-series dashboards (Metabase, Looker Studio), and automated variance checks.
+* **Daily queries**: Add `WHERE is_total = FALSE` to aggregate daily numbers without double counting.
+* **Weekly Totals**: Add `WHERE is_total = TRUE` to immediately retrieve the official weekly totals as extracted from the Excel file.
 
 ---
 

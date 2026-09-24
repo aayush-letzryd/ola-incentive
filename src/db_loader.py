@@ -163,7 +163,7 @@ class DBLoader:
                 # 4. Insert Summary Tab
                 if not df_summary.empty:
                     cols = ['date', 'report_type', 'actual_incentive', 'actual_ondemand',
-                            'instapay_transfer', 'total_online_payment', 'source_file_name',
+                            'instapay_transfer', 'total_online_payment', 'is_total', 'source_file_name',
                             'source_file_id', 'week_start_date', 'week_end_date']
                     records = [tuple(x) for x in df_summary[cols].to_numpy()]
                     query = f"""

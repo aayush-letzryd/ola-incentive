@@ -205,7 +205,37 @@ class ExcelProcessor:
             if pd.isna(date_val):
                 continue
             date_str = str(date_val).strip().lower()
-            if date_str in ['total', 'diff', 'difference', 'variance']:
+            if date_str in ['diff', 'difference', 'variance']:
+                continue
+
+            # Handle the Total row from Excel
+            if date_str == 'total':
+                rows.append({
+                    'date': week_end,
+                    'report_type': 'Ola report',
+                    'actual_incentive': float(df_raw.iloc[idx, 1]) if pd.notna(df_raw.iloc[idx, 1]) else 0.0,
+                    'actual_ondemand': float(df_raw.iloc[idx, 2]) if pd.notna(df_raw.iloc[idx, 2]) else 0.0,
+                    'instapay_transfer': float(df_raw.iloc[idx, 3]) if pd.notna(df_raw.iloc[idx, 3]) else 0.0,
+                    'total_online_payment': float(df_raw.iloc[idx, 4]) if pd.notna(df_raw.iloc[idx, 4]) else 0.0,
+                    'is_total': True,
+                    'source_file_name': file_name,
+                    'source_file_id': file_id,
+                    'week_start_date': week_start,
+                    'week_end_date': week_end
+                })
+                rows.append({
+                    'date': week_end,
+                    'report_type': 'Bank statement',
+                    'actual_incentive': float(df_raw.iloc[idx, 5]) if pd.notna(df_raw.iloc[idx, 5]) else 0.0,
+                    'actual_ondemand': float(df_raw.iloc[idx, 6]) if pd.notna(df_raw.iloc[idx, 6]) else 0.0,
+                    'instapay_transfer': float(df_raw.iloc[idx, 7]) if pd.notna(df_raw.iloc[idx, 7]) else 0.0,
+                    'total_online_payment': float(df_raw.iloc[idx, 8]) if pd.notna(df_raw.iloc[idx, 8]) else 0.0,
+                    'is_total': True,
+                    'source_file_name': file_name,
+                    'source_file_id': file_id,
+                    'week_start_date': week_start,
+                    'week_end_date': week_end
+                })
                 continue
 
             try:
@@ -221,6 +251,7 @@ class ExcelProcessor:
                 'actual_ondemand': float(df_raw.iloc[idx, 2]) if pd.notna(df_raw.iloc[idx, 2]) else 0.0,
                 'instapay_transfer': float(df_raw.iloc[idx, 3]) if pd.notna(df_raw.iloc[idx, 3]) else 0.0,
                 'total_online_payment': float(df_raw.iloc[idx, 4]) if pd.notna(df_raw.iloc[idx, 4]) else 0.0,
+                'is_total': False,
                 'source_file_name': file_name,
                 'source_file_id': file_id,
                 'week_start_date': week_start,
@@ -235,6 +266,7 @@ class ExcelProcessor:
                 'actual_ondemand': float(df_raw.iloc[idx, 6]) if pd.notna(df_raw.iloc[idx, 6]) else 0.0,
                 'instapay_transfer': float(df_raw.iloc[idx, 7]) if pd.notna(df_raw.iloc[idx, 7]) else 0.0,
                 'total_online_payment': float(df_raw.iloc[idx, 8]) if pd.notna(df_raw.iloc[idx, 8]) else 0.0,
+                'is_total': False,
                 'source_file_name': file_name,
                 'source_file_id': file_id,
                 'week_start_date': week_start,
