@@ -12,7 +12,8 @@ set -e
 PROJECT_ID=${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null)}
 REGION=${GCP_REGION:-"asia-south1"}
 JOB_NAME="ola-incentive-etl-job"
-IMAGE_NAME="gcr.io/${PROJECT_ID}/ola-incentive-etl:latest"
+REPO_NAME="ola-repo"
+IMAGE_NAME="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/ola-incentive-etl:latest"
 SCHEDULER_JOB_NAME="ola-incentive-daily-trigger"
 CRON_SCHEDULE="0 9,15,21 * * *" # Runs 3 times a day at 09:00, 15:00, 21:00 UTC
 TIMEZONE="Asia/Kolkata"
@@ -27,6 +28,7 @@ echo "=========================================================="
 echo "Deploying Ola Incentive Pipeline to GCP"
 echo "Project ID : ${PROJECT_ID}"
 echo "Region     : ${REGION}"
+echo "Repository : ${REPO_NAME}"
 echo "Image      : ${IMAGE_NAME}"
 echo "Job Name   : ${JOB_NAME}"
 echo "Scheduler  : ${CRON_SCHEDULE} (${TIMEZONE})"
@@ -38,11 +40,22 @@ gcloud services enable \
     run.googleapis.com \
     cloudscheduler.googleapis.com \
     cloudbuild.googleapis.com \
-    containerregistry.googleapis.com \
+    artifactregistry.googleapis.com \
     --project="${PROJECT_ID}"
 
-# 2. Build and Push Container Image using Cloud Build
-echo "Step 2: Building container image via Cloud Build..."
+# 2. Ensure Artifact Registry Docker Repository Exists
+echo "Step 2: Checking Artifact Registry repository..."
+if ! gcloud artifacts repositories describe "${REPO_NAME}" --location="${REGION}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+    echo "Creating Artifact Registry repository '${REPO_NAME}' in ${REGION}..."
+    gcloud artifacts repositories create "${REPO_NAME}" \
+        --repository-format=docker \
+        --location="${REGION}" \
+        --description="Docker repository for Ola Incentive pipeline" \
+        --project="${PROJECT_ID}"
+fi
+
+# 3. Build and Push Container Image using Cloud Build
+echo "Step 3: Building container image via Cloud Build..."
 gcloud builds submit --tag "${IMAGE_NAME}" --project="${PROJECT_ID}"
 
 DEFAULT_PASS='8S5]U3@L^Xz)\FH}'
