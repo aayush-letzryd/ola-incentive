@@ -85,21 +85,6 @@ All tables reside in the `public` schema in PostgreSQL:
 | `sheet_ola_incentive_ola_report` | Raw Ola platform transaction report | `date`, `type`, `car_number`, `car_model`, `date_for`, `amount_raw`, `status`, `sub_category`, `payment_type`, `week_start_date` |
 | `sheet_ola_incentive_pipeline_logs` | Audit log of every pipeline execution cycle | `file_id`, `file_name`, `status_rows_count`, `bank_statement_rows_count`, `summary_rows_count`, `ola_report_rows_count`, `total_rows_count`, `execution_status`, `started_at`, `completed_at` |
 
-### Reconciliation Analytical View
-The pipeline automatically deploys `public.vw_ola_incentive_summary_reconciliation` which joins Ola Report and Bank Statement numbers side by side:
-```sql
-SELECT 
-    date,
-    ola_actual_incentive,
-    bank_actual_incentive,
-    diff_actual_incentive,
-    ola_total_online_payment,
-    bank_total_online_payment,
-    diff_total_online_payment
-FROM public.vw_ola_incentive_summary_reconciliation
-ORDER BY date DESC;
-```
-
 ---
 
 ## 🔄 Summary Tab Transformation (Unpivoting)

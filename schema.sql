@@ -127,34 +127,3 @@ CREATE TABLE IF NOT EXISTS public.sheet_ola_incentive_pipeline_logs (
 CREATE INDEX IF NOT EXISTS idx_ola_pipeline_file_id ON public.sheet_ola_incentive_pipeline_logs(file_id);
 CREATE INDEX IF NOT EXISTS idx_ola_pipeline_status ON public.sheet_ola_incentive_pipeline_logs(execution_status);
 CREATE INDEX IF NOT EXISTS idx_ola_pipeline_week ON public.sheet_ola_incentive_pipeline_logs(week_start_date);
-
--- ========================================================================
--- Analytical View: Weekly Summary Reconciliation (Ola vs Bank Statement)
--- ========================================================================
-CREATE OR REPLACE VIEW public.vw_ola_incentive_summary_reconciliation AS
-SELECT 
-    COALESCE(o.date, b.date) AS date,
-    COALESCE(o.week_start_date, b.week_start_date) AS week_start_date,
-    COALESCE(o.week_end_date, b.week_end_date) AS week_end_date,
-    COALESCE(o.source_file_name, b.source_file_name) AS source_file_name,
-    -- Ola Report Metrics
-    COALESCE(o.actual_incentive, 0) AS ola_actual_incentive,
-    COALESCE(o.actual_ondemand, 0) AS ola_actual_ondemand,
-    COALESCE(o.instapay_transfer, 0) AS ola_instapay_transfer,
-    COALESCE(o.total_online_payment, 0) AS ola_total_online_payment,
-    -- Bank Statement Metrics
-    COALESCE(b.actual_incentive, 0) AS bank_actual_incentive,
-    COALESCE(b.actual_ondemand, 0) AS bank_actual_ondemand,
-    COALESCE(b.instapay_transfer, 0) AS bank_instapay_transfer,
-    COALESCE(b.total_online_payment, 0) AS bank_total_online_payment,
-    -- Variance (Bank - Ola)
-    (COALESCE(b.actual_incentive, 0) - COALESCE(o.actual_incentive, 0)) AS diff_actual_incentive,
-    (COALESCE(b.actual_ondemand, 0) - COALESCE(o.actual_ondemand, 0)) AS diff_actual_ondemand,
-    (COALESCE(b.instapay_transfer, 0) - COALESCE(o.instapay_transfer, 0)) AS diff_instapay_transfer,
-    (COALESCE(b.total_online_payment, 0) - COALESCE(o.total_online_payment, 0)) AS diff_total_online_payment
-FROM (
-    SELECT * FROM public.sheet_ola_incentive_summary WHERE report_type = 'Ola report'
-) o
-FULL OUTER JOIN (
-    SELECT * FROM public.sheet_ola_incentive_summary WHERE report_type = 'Bank statement'
-) b ON o.date = b.date AND o.source_file_id = b.source_file_id;
