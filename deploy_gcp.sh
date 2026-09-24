@@ -45,6 +45,9 @@ gcloud services enable \
 echo "Step 2: Building container image via Cloud Build..."
 gcloud builds submit --tag "${IMAGE_NAME}" --project="${PROJECT_ID}"
 
+DEFAULT_PASS='8S5]U3@L^Xz)\FH}'
+PASS_TO_USE="${DB_PASS:-$DEFAULT_PASS}"
+
 # 3. Deploy or Update Cloud Run Job
 echo "Step 3: Deploying Cloud Run Job..."
 gcloud run jobs deploy "${JOB_NAME}" \
@@ -55,7 +58,7 @@ gcloud run jobs deploy "${JOB_NAME}" \
     --task-timeout=15m \
     --memory=1Gi \
     --cpu=1 \
-    --set-env-vars="DB_HOST=${DB_HOST:-35.200.196.113},DB_PORT=${DB_PORT:-5432},DB_NAME=${DB_NAME:-postgres},DB_USER=${DB_USER:-postgres},DB_PASS=${DB_PASS:-8S5]U3@L^Xz)\FH}},GDRIVE_FOLDER_ID=${GDRIVE_FOLDER_ID:-1BXtva5QfEOGvVmCKBxJxgpJnDDLpSBbC},LOG_LEVEL=INFO" \
+    --set-env-vars="DB_HOST=${DB_HOST:-35.200.196.113},DB_PORT=${DB_PORT:-5432},DB_NAME=${DB_NAME:-postgres},DB_USER=${DB_USER:-postgres},DB_PASS=${PASS_TO_USE},GDRIVE_FOLDER_ID=${GDRIVE_FOLDER_ID:-1BXtva5QfEOGvVmCKBxJxgpJnDDLpSBbC},LOG_LEVEL=INFO" \
     --project="${PROJECT_ID}"
 
 # 4. Create Service Account for Cloud Scheduler if needed
