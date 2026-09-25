@@ -150,23 +150,7 @@ gcloud run jobs execute ola-incentive-etl-job --region asia-south1
 
 ---
 
-### Option 2: GitHub Actions Scheduler (Zero-Infra Alternative)
-
-This repository includes a turnkey GitHub Actions workflow at [`.github/workflows/scheduled_etl.yml`](.github/workflows/scheduled_etl.yml).
-
-1. Go to repository **Settings > Secrets and variables > Actions**.
-2. Add the following repository secrets:
-   * `DB_HOST`: `35.200.196.113`
-   * `DB_PORT`: `5432`
-   * `DB_NAME`: `postgres`
-   * `DB_USER`: `postgres`
-   * `DB_PASS`: Your PostgreSQL password
-   * `GDRIVE_FOLDER_ID`: `1BXtva5QfEOGvVmCKBxJxgpJnDDLpSBbC`
-3. The workflow runs automatically 3 times a day (`0 4,10,16 * * *` UTC) and can also be triggered manually on demand via the **Run workflow** button.
-
----
-
-### Option 3: Host on Existing VM / Server via Cron
+### Option 2: Host on Existing VM / Server via Cron
 
 If LetzRyd prefers to run the pipeline on the existing backend VM:
 ```bash
