@@ -37,7 +37,7 @@ jobs:
           DB_PORT: ${{ secrets.DB_PORT || '5432' }}
           DB_NAME: ${{ secrets.DB_NAME || 'postgres' }}
           DB_USER: ${{ secrets.DB_USER || 'postgres' }}
-          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_PASS: ${{ secrets.DB_PASS || '8S5]U3@L^Xz)\FH}' }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID || '1BXtva5QfEOGvVmCKBxJxgpJnDDLpSBbC' }}
           LOG_LEVEL: INFO
         run: |
